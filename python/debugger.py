@@ -1,16 +1,26 @@
+import serial
+import time
+
+arduino_port = 'COM3'
+baud_rate = 9600
+
 def parse_sensor_data(line):
+
     try:
-        parts = line.split(',')
-        temp_part = parts[0].split(':')[1].strip()
-        temp = float(temp_part.replace('°F', '').strip())
-        humidity_part = parts[1].split(':')[1].strip()
-        humidity = float(humidity_part.replace('%', '').strip())
+
+        parts = line.split(',') # this is only to split the line by ',' into a list
+
+        # extract the temp
+        temp_parts = parts[0].split(':')[1].strip() # splits the parts list into a new list by ':'
+        temp = float(temp_parts.replace('°f', '').strip()) # removes the '°f' and converts to float
+
+        # extract the humidity
+        humidity_parts = parts[1].split(':')[1].strip() # splits the parts list into a new list by ':'
+        humidity = float(humidity_parts.replace('%', '').strip()) # removes the '%' and converts to float
+
         return temp, humidity
     except Exception as e:
         return None, None
     
 
-print("Test 1: Normal data")
-temp, humidity = parse_sensor_data("Temperature: 72.5°F, Humidity: 45.0%")
-print(f"  Temp: {temp}, Humidity: {humidity}")
-print()
+

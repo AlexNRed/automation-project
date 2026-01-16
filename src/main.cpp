@@ -24,11 +24,11 @@ void loop() {
     return;
   }
 
-  delay(1.2 * 1000);
   Serial.print("Temperature: ");
   Serial.print(temperature);
-  delay(1.2 * 1000);
   Serial.print(" °F, Humidity: ");
   Serial.print(humidity);
+  Serial.println("%");
+  
 }
 
