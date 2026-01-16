@@ -1,0 +1,29 @@
+#include <Arduino.h>
+
+#define redPin 10
+#define greenPin 9
+#define bluePin 8
+
+void setup() {
+  pinMode(redPin, OUTPUT);
+  pinMode(greenPin, OUTPUT);
+  pinMode(bluePin, OUTPUT);
+  digitalWrite(redPin, LOW);
+  digitalWrite(greenPin, LOW);
+  digitalWrite(bluePin, LOW);
+}
+
+void loop() {
+  /*digitalWrite(redPin, HIGH);
+  delay(1000);
+  digitalWrite(redPin, LOW);
+  delay(1000);
+  digitalWrite(greenPin, HIGH);
+  delay(1000);
+  digitalWrite(greenPin, LOW);
+  delay(1000);
+  digitalWrite(bluePin, HIGH);
+  delay(1000);
+  digitalWrite(bluePin, LOW);
+  delay(1000); 8*/
+}

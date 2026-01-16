@@ -56,10 +56,13 @@ def main():
 
                         if temp > 78:
                             print("   → 🔥 It's HOT! Fan should be ON")
+                            arduino.write(b'LED_RED\n') # Turn on red LED and represents the hottness
                         elif temp < 68:
                             print("   → ❄️  It's COLD! Heater should be ON")
+                            arduino.write(b'LED_BLUE\n') # Turn on blue LED and represents the coldness
                         else:
                             print("   → ✓ Temperature is comfortable")
+                            arduino.write(b'LED_GREEN\n') # Turn on green LED and represents when the temp is just right. 
 
                         if humidity > 60:
                             print("   → 💦 High humidity - consider dehumidifier")
@@ -85,6 +88,10 @@ def main():
         print()
         print("=" * 50)
         print("Stopping monitor...")
+
+        arduino.write(b'LED_OFF\n') 
+        time.sleep(0.5) 
+
         arduino.close()
         print("✓ Disconnected from Arduino")
         print("=" * 50)
