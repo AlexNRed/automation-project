@@ -1,5 +1,7 @@
 import serial
 import time
+import csv
+from datetime import datetime
 
 arduino_port = 'COM3'
 baud_rate = 9600
@@ -49,7 +51,17 @@ def main():
 
                     if temp is not None and humidity is not None:
                         
+                        # creating a variable to Log the data from our arduino to a CSV (Comma Seperated Values) file
+                        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         
+                        with open('temperature_log.csv', mode='a', newline='') as logFile: # creates a file called temperature_log.csv, mode a represents appending,
+                            logWriter = csv.writer(logFile) # object that will write to the file
+                            
+                            if logFile.tell() == 0: # checks if the file is empty
+                                logWriter.writerow(['Timestamp', 'Temperature (°F)', 'Humidity (%)']) # writes the header row
+
+                            logWriter.writerow([timestamp, temp, humidity]) # writes the actual data
+
                         print(f"🌡️  Temperature: {temp}°F")
                         
                         print(f"💧 Humidity: {humidity}%")
@@ -99,7 +111,7 @@ def main():
     except Exception as e:
         print(f"Unexpected error: {e}")
 
-    ## To see what to put within the excepts, you would first run your code without try and except and see the erorrs that you can get.
+    ## To see what to put within the excepts, you would first run your code without try and except and see the erors that you can get.
 
 if __name__ == "__main__":
     main()
