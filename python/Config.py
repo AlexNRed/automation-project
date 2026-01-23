@@ -8,6 +8,11 @@ from typing import Optional, Tuple
 from dataclasses import dataclass
 import json
 
+
+# ============================================================================
+# CONFIGURATION SECTION
+# ============================================================================
+
 @dataclass #A decorator - a moidifer or enchancer for this class
 class Config:
     """
@@ -61,13 +66,21 @@ class Config:
         with open(filepath, 'w') as logFile:
             json.dump(self.__dict__, logFile, indent=4)
 
+# ============================================================================
+# LOGGING SETUP
+# ============================================================================
+
     def setup_logging(log_file: str = 'app.log') -> None:
         """ the method is to set up the logging system to print out the data onto a file and also the terminal?"""
         logging.basicConfig(level = logging.INFO, 
                             format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', handlers=[logging.FileHandler(log_file), logging.StreamHandler()] ) #sets the logging level to INFO (5 Levels: DEBUG, INFO, WARNING, ERORR, CRITICAL) -> Saying: "Show me INFO messages and everything MORE important than INFO" , logging provides all the values automatically
         """Logging.basicConfig sets up the logging system with the settings you specify. 
         You only call this once at the start of your program. """
-        
+
+# ============================================================================
+# DATA MODELS
+# ============================================================================
+
 @dataclass
 class SensorReading:
     temperature: float
@@ -93,7 +106,11 @@ class SensorReading:
             'humidity': self.humidity,
             'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
         }
-    
+
+# ============================================================================
+# ARDUINO COMMUNICATION CLASS
+# ============================================================================
+
 class ArudinoController:
     """tm"""
 
@@ -116,3 +133,42 @@ class ArudinoController:
         except serial.SerialException as e:
             self.logger.error(f"Failed to connect to Arduino: {e}")
             return False
+
+    def disconnect(self) -> None:
+        """method used to close the serial connection"""
+        if self.serial_connection and self.serial_connection.is_open:
+            self.send_command('LED_OFF')  # Turn off LED before disconnecting
+            time.sleep(0.5)
+            self.serial_connection.close()
+            self.logger.info("Disconnected from Arduino")
+            """"If there's an open connection, turn off the LED, wait a moment, close the connection cleanly, and log that we disconnected."""
+
+    def send_command(self, command: str) -> None:
+        """Method is intended to send a command to the arduino through the serial connection through bytes."""
+        if self.serial_connection and self.serial_connection.is_open:
+            try:
+                self.serial_connection.write(f'{command}\n'.encode()) #write method uses bytes and the encode method converts the string to bytes
+                self.logger.debug(f"Sent command: {command}")
+            except serial.SerialException as e:
+                self.logger.error(f"Failed to send command '{command}': {e}")
+    
+    def readLine(self) -> Optional[str]: #Either none or a String 
+        """
+        Read a line from the serial port.
+        Returns None if no data available or on error.
+        """
+        try:
+            if self.serial_connection.in_waiting > 0: #checks if there is data available to read (data = 1)
+                line = self.serial_connection.readline().decode('utf-8', errors='ignore').strip() # readline Method reads byte from the serial port until \n, decode method converts bytes into strings (if any bug just skip it), and strip method removes any extra whitespace from the beginning and end
+                return line if line else None #if line has data return it, else return None, short end for if line else none,
+        except serial.SerialException as e:
+                self.logger.error(f"Failed to read from serial port: {e}")
+
+        return None
+    
+# ============================================================================
+# DATA PARSER
+# ============================================================================
+
+class SensorDataParser:
+    pass
