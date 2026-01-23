@@ -70,5 +70,49 @@ class Config:
         
 @dataclass
 class SensorReading:
-    pass
+    temperature: float
+    humidity: float
+    timestamp: datetime = None
 
+    def __post_init__(self):
+        """Automatically sets the timestamp if not provided"""
+        if self.timestamp is None:
+            self.timestamp = datetime.now()
+
+    def is_valid(self, config: Config) -> bool:
+        """Checks if the readings are within the valid ranges"""
+        return(
+            config.temp_min <= self.temperature <= config.temp_max and 
+            config.humidity_min <= self.humidity <= config.hum_max
+        )
+    
+    def to_dict(self) -> dict:
+        """Converts the reading to a dictionary format so it's easier to log/save"""
+        return {
+            'temperature': self.temperature,
+            'humidity': self.humidity,
+            'timestamp': self.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        }
+    
+class ArudinoController:
+    """tm"""
+
+    def __init__(self, config: Config):
+        self.config = config #stores the config object passed to the constructor
+        self.serial_connection: Optional[serial.Serial] = None #initially no serial connection but later will be assigned a serial.Serial object
+        self.logger  = logging.getLogger(__name__) #creates a logger object for this module
+
+    def connect(self) -> bool:
+        """Establishes a serial connection to the Arduino."""
+        try: 
+            self.serial_connection = serial.Serial( #establishes the serial connection that was before, None
+                self.config.arduino_port, 
+                self.config.baud_rate, 
+                timeout=self.config.serial_timeout
+            )
+            time.sleep(2)  # wait for the connection to establish
+            self.logger.info(f"Connected to Arduino on port {self.config.arduino_port}")
+            return True
+        except serial.SerialException as e:
+            self.logger.error(f"Failed to connect to Arduino: {e}")
+            return False
